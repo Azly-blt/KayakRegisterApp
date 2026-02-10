@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kayak polo Verneuil</title>
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="/css/index.css">
 </head>
 <body>
     <div class="container">
@@ -15,6 +15,25 @@
                 <a href="inscription.html">Inscription</a>
             </nav>
         </header>
+    </div>
+
+    <div class="main">
+        <h1>Connexion</h1>
+        <form action="php/traitement_connexion.php" method="post">
+                <input type="hidden" name="controleur" value="controleur">
+                <input type="hidden" name="action" value="compte">
+                <div class="container-col">
+                    <div class="container-input">
+                        <input autocomplete="off" class="input" type="text" name="email" placeholder="" required>
+                        <label for="email" class="label">Email</label>
+                    </div>
+                    <div class="container-input">
+                        <input autocomplete="off" class="input" type="password" name="mdp" placeholder="" required>
+                        <label for="mdp" class="label">mot de passe</label>
+                    </div>
+                </div>
+                <button class="button" type="submit">Se connecter</button>
+            </form>
     </div>
 </body>
 </html>
