@@ -9,6 +9,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $prenom = $_POST['prenom'];
     $email = strtolower(trim($_POST['email'])); // On met l'email en minuscules
     $mdp_clair = $_POST['password'];
+    
+
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    header("Location: ../inscription.html?error=3");
+    exit();
+    }
+    
+    $domaine = substr(strrchr($email, "@"), 1);
+
+    if (!checkdnsrr($domaine, "MX")) {
+        // On renvoie une erreur 4 (Domaine inconnu ou faux)
+        header("Location: ../inscription.html?error=4");
+        exit();
+    }
 
     // 2. ON HACHE LE MOT DE PASSE (Algorithme BCRYPT par défaut)
     $mdp_hache = password_hash($mdp_clair, PASSWORD_DEFAULT);
@@ -36,7 +50,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } catch (PDOException $e) {
         // Gestion de l'erreur si l'email existe déjà (contrainte UNIQUE)
         if ($e->getCode() == 23505) { 
-            echo "Erreur : Cet email est déjà utilisé.";
+            header("Location: ../inscription.html?error=2");
+            exit();
         } else {
             echo "Erreur lors de l'inscription : " . $e->getMessage();
         }

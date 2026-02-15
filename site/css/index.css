@@ -200,3 +200,14 @@ form {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     font-size: 1.3rem;
 }
+
+.texte-erreur {
+    color: #ff4d4d; /* Un rouge vif mais doux pour les yeux */
+    font-size: 0.85rem;
+    font-family: 'Lato', sans-serif;
+    margin-top: -15px; /* Pour le remonter un peu vers l'input */
+    margin-bottom: 10px;
+    text-align: left;
+    width: 100%;
+    padding-left: 15px;
+}
