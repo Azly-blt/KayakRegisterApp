@@ -4,6 +4,7 @@ require_once 'connexion.php'; // On inclut ton fichier de connexion PDO
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // 1. On récupère les données du formulaire
+    $username = $_POST['pseudo'];
     $nom = $_POST['nom'];
     $prenom = $_POST['prenom'];
     $email = strtolower(trim($_POST['email'])); // On met l'email en minuscules
@@ -14,7 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     try {
         // 3. Préparation de la requête SQL (on évite les injections SQL)
-        $sql = "INSERT INTO client (nom, prenom, email, mot_de_passe) VALUES (:nom, :prenom, :email, :mdp)";
+        $sql = "INSERT INTO client (nom, prenom, email, mot_de_passe, username) VALUES (:nom, :prenom, :email, :mdp, :username)";
         $stmt = $pdo->prepare($sql);
         
         // 4. Exécution avec les vraies valeurs
@@ -22,11 +23,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             ':nom' => $nom,
             ':prenom' => $prenom,
             ':email' => $email,
-            ':mdp' => $mdp_hache
+            ':mdp' => $mdp_hache,
+            ':username' => $username
         ]);
 
         $_SESSION['user_nom'] = $nom;
         $_SESSION['user_prenom'] = $prenom;
+        $_SESSION['username'] = $username;
         header("Location:accueil.php");
         exit();
 
