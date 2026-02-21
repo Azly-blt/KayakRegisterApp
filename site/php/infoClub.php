@@ -5,6 +5,37 @@
             header("Location:connexion.html");
             exit();
         }
+
+        try {
+        // 3. Préparation de la requête SQL (on évite les injections SQL)
+        $sql = "SELECT nomEvenement, dateEvenement, nomVilleEvenement, codePostalEvenement 
+FROM events WHERE dateEvenement BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 11 DAY) ORDER BY dateEvenement ASC";
+        $stmt = $pdo->prepare($sql);
+        
+        // 4. Exécution avec les vraies valeurs
+        $stmt->execute([
+            ':nom' => $nom,
+            ':prenom' => $prenom,
+            ':email' => $email,
+            ':mdp' => $mdp_hache,
+            ':username' => $username
+        ]);
+
+        $_SESSION['user_nom'] = $nom;
+        $_SESSION['user_prenom'] = $prenom;
+        $_SESSION['username'] = $username;
+        header("Location:accueil.php");
+        exit();
+
+    } catch (PDOException $e) {
+        // Gestion de l'erreur si l'email existe déjà (contrainte UNIQUE)
+        if ($e->getCode() == 23506) { 
+            header("Location: ../infoClub.php?error=8");
+            exit();
+        }
+    }
+
+
     ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -28,8 +59,10 @@
         </header>
     </div>
     <div class="main">
-        <h1>Bonjour <span><?php echo htmlspecialchars($_SESSION['user_prenom'] . " " . $_SESSION['user_nom']); ?></span></h1>
-        <p>Bienvenue sur la page du club.</p>
+        <h1>Bienvenue sur la page du club de Verneuil sur seine !</h1>
+
+        <h2>Prochains évenements :</h2>
+
 
     </div>
 </body>
