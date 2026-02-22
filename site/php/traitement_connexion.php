@@ -3,15 +3,11 @@ session_start();
 require_once 'connexion.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // 1. On récupère l'identifiant unique (qui peut être l'email OU le nom)
-    // Dans ton HTML, l'input doit maintenant avoir name="identifiant"
-    $identifiant = (trim($_POST['identifiant']));
+    $identifiant = trim($_POST['identifiant']);
     $mdp_saisi = $_POST['mdp']; 
 
     try {
-        // 2. On cherche l'utilisateur soit par email, soit par nom
-        // L'opérateur OR permet de vérifier les deux colonnes
-        $sql = "SELECT id, nom, prenom, mot_de_passe, username
+        $sql = "SELECT id, nom, prenom, mot_de_passe, username, user_role
                 FROM client 
                 WHERE LOWER(email) = LOWER(:id) OR LOWER(username) = LOWER(:id) 
                 LIMIT 1";
@@ -20,25 +16,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->execute([':id' => $identifiant]);
         $user = $stmt->fetch();
 
-        // 3. Vérification du mot de passe
+        // 1. On vérifie d'abord SI l'utilisateur existe ET SI le mot de passe est bon
         if ($user && password_verify($mdp_saisi, $user['mot_de_passe'])) {
             
-            // 4. Succès : Hydratation de la session
+            // 2. C'est un succès ! On remplit la session
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_nom'] = $user['nom'];
             $_SESSION['user_prenom'] = $user['prenom'];
+            $_SESSION['user_role'] = $user['user_role']; // Le point-virgule est bien là !
 
-            header("Location: accueil.php");
-            exit();
+            // 3. On redirige en fonction du rôle
+            if ($_SESSION['user_role'] === 'admin') {
+                header("Location: accueilAdmin.php");
+                exit();
+            } else {
+                header("Location: accueil.php");
+                exit();
+            }
 
         } else {
-            // Échec : on redirige avec un code d'erreur
+            // Échec : mauvais identifiant ou mauvais mot de passe
             header("Location: ../connexion.html?error=1");
             exit();
         }
 
     } catch (PDOException $e) {
-        // En production, évite d'afficher $e->getMessage() pour ne pas dévoiler ta structure de base
         error_log($e->getMessage());
         die("Erreur technique. Veuillez réessayer plus tard.");
     }

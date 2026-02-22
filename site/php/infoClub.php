@@ -1,68 +1,103 @@
 <?php
-        session_start();
+session_start();
+require_once 'connexion.php';
 
-        if(!isset($_SESSION['user_nom'])){
-            header("Location:connexion.html");
-            exit();
-        }
+try {
+    // 2. Préparation de la requête (Correction des majuscules pour PostgreSQL)
+    $sql = 'SELECT "nomEvenement", "dateEvenement", "adresseEvenement" 
+            FROM events
+            ORDER BY "dateEvenement" ASC';
+    
+    $stmt = $pdo->prepare($sql);
+    
+    // 3. EXECUTION de la requête (La ligne qu'il te manquait !)
+    $stmt->execute();
+    
+    // 4. Récupération des données
+    $evenements = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        try {
-        // 3. Préparation de la requête SQL (on évite les injections SQL)
-        $sql = "SELECT nomEvenement, dateEvenement, nomVilleEvenement, codePostalEvenement 
-FROM events WHERE dateEvenement BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 11 DAY) ORDER BY dateEvenement ASC";
-        $stmt = $pdo->prepare($sql);
-        
-        // 4. Exécution avec les vraies valeurs
-        $stmt->execute([
-            ':nom' => $nom,
-            ':prenom' => $prenom,
-            ':email' => $email,
-            ':mdp' => $mdp_hache,
-            ':username' => $username
-        ]);
+} catch (PDOException $e) {
+    // Si la connexion ou la requête échoue
+    die("Erreur de base de données : " . $e->getMessage());
+}
+?>
 
-        $_SESSION['user_nom'] = $nom;
-        $_SESSION['user_prenom'] = $prenom;
-        $_SESSION['username'] = $username;
-        header("Location:accueil.php");
-        exit();
-
-    } catch (PDOException $e) {
-        // Gestion de l'erreur si l'email existe déjà (contrainte UNIQUE)
-        if ($e->getCode() == 23506) { 
-            header("Location: ../infoClub.php?error=8");
-            exit();
-        }
-    }
-
-
-    ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/index.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
-    <title>Accueil</title>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;700&family=Kanit:ital,wght@1,700&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <title>Accueil - Club de Kayak Polo</title>
 </head>
 <body>
     <div class="container">
         <header>
             <nav>
-                <a href="accueil.php">Accueil</a>
-                <a href="infoClub.php">Le club</a>
-                <a href="logout.php">Deconnexion</a>
+                <?php 
+                // 1er cas : L'utilisateur est connecté ET c'est un ADMIN
+                if (isset($_SESSION['user_nom']) && isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') : 
+                ?>
+                    <a href="accueilAdmin.php">Accueil</a>
+                    
+                <?php 
+                // 2ème cas : L'utilisateur est connecté mais c'est un CLIENT classique
+                elseif (isset($_SESSION['user_nom'])) : 
+                ?>
+                    <a href="accueil.php">Accueil</a>
+                    
+                <?php 
+                // 3ème cas : Personne n'est connecté (VISITEUR)
+                else : 
+                ?>
+                    <a href="../index.html">Accueil</a>
+                <?php endif; ?>
+                
+                
+                <?php 
+                // Gestion des boutons Connexion / Déconnexion / Inscription
+                if (isset($_SESSION['user_nom'])) : 
+                ?>
+                    <a href="logout.php">Déconnexion</a>
+                <?php else : ?>
+                    <a href="../connexion.html">Connexion</a>
+                    <a href="../inscription.html">Inscription</a>
+                <?php endif; ?>
             </nav>
         </header>
     </div>
+
     <div class="main">
-        <h1>Bienvenue sur la page du club de Verneuil sur seine !</h1>
+        <h1>Bienvenue sur la page du club de Verneuil-sur-Seine !</h1>
 
-        <h2>Prochains évenements :</h2>
+        <h2>Prochains événements :</h2>
 
+        <?php
+        // 5. AFFICHAGE HTML AU BON ENDROIT (dans le body)
+        // On vérifie d'abord s'il y a des événements trouvés
+        if (!empty($evenements)) {
+            
+            // La boucle foreach englobe TOUT l'affichage HTML
+            foreach ($evenements as $event) {
+                $nomEvent = htmlspecialchars($event['nomEvenement']);
+                $dateEvent = htmlspecialchars($event['dateEvenement']);
+                $addrEvent = htmlspecialchars($event['adresseEvenement']);
+                
+                // On affiche les bonnes variables ($nomEvent, pas $nom)
+                echo "<div class='container-col'>";
+                echo "<h3>$nomEvent</h3>";
+                echo "<p>Date : $dateEvent</p>";
+                echo "<p>Lieu : $addrEvent</p>";
+                echo "</div>";
+            }
+        } else {
+            // Message stylé si aucun match n'est prévu
+            echo "<p>Aucun événement prévu dans les 11 prochains jours. Repos !</p>";
+        }
+        ?>
 
     </div>
 </body>
