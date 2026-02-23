@@ -29,7 +29,6 @@
     </div>
     <div class="main">
         <h1>Bonjour <span><?php echo htmlspecialchars($_SESSION['user_prenom'] . " " . $_SESSION['user_nom']); ?></span></h1>
-        <p>Bienvenue sur ton espace Kayak Polo Verneuil.</p>
 
         <a href="logout.php" class="button">Deconnexion</a>
     </div>

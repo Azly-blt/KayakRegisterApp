@@ -21,7 +21,7 @@
     <div class="container">
         <header>
             <nav>
-                <a href="accueil.php">Accueil</a>
+                <a href="accueilAdmin.php">Accueil</a>
                 <a href="infoClub.php">Le club</a>
                 <a href="logout.php">Deconnexion</a>
                 <a href="creeEvenement.php">Gestion club</a>

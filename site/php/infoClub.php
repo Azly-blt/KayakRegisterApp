@@ -42,6 +42,7 @@ try {
                 if (isset($_SESSION['user_nom']) && isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') : 
                 ?>
                     <a href="accueilAdmin.php">Accueil</a>
+                    <a href="creeEvenement.php">Gestion club</a>
                     
                 <?php 
                 // 2ème cas : L'utilisateur est connecté mais c'est un CLIENT classique

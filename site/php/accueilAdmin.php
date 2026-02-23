@@ -21,10 +21,11 @@
     <div class="container">
         <header>
             <nav>
-                <a href="accueil.php">Accueil</a>
+                <a href="accueilAdmin.php">Accueil</a>
                 <a href="infoClub.php">Le club</a>
-                <a href="logout.php">Deconnexion</a>
                 <a href="creeEvenement.php">Gestion club</a>
+                <a href="logout.php">Deconnexion</a>
+
             </nav>
         </header>
     </div>
@@ -32,9 +33,8 @@
         <h1>Page admin</h1>
 
         <h1>Bonjour <span><?php echo htmlspecialchars($_SESSION['user_prenom'] . " " . $_SESSION['user_nom']); ?></span></h1>
-        <p>Bienvenue sur ton espace Kayak Polo Verneuil.</p>
 
-        <a href="creeEvenement.php">Gestion club</a>
+        <a href="creeEvenement.php" class="button">Gestion club</a>
 
         <a href="logout.php" class="button">Deconnexion</a>
     </div>
