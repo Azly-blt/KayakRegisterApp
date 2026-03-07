@@ -88,7 +88,7 @@ try {
                 $addrEvent = htmlspecialchars($event['adresseEvenement']);
                 
                 // On affiche les bonnes variables ($nomEvent, pas $nom)
-                echo "<div class='container-col'>";
+                echo "<div class='container-event'>";
                 echo "<h3>$nomEvent</h3>";
                 echo "<p>Date : $dateEvent</p>";
                 echo "<p>Lieu : $addrEvent</p>";
